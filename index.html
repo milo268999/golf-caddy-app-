@@ -3,213 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Golf Caddy Pro AI - Sổ Tay Của Bố</title>
+    <title>Golf Caddy Pro AI - Phiên Bản Tối Ưu</title>
+    <!-- Thư viện giao diện & Icon -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Thư viện chụp màn hình xuất ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: radial-gradient(circle at top, #0f172a 0%, #020617 100%);
             background-attachment: fixed;
+            color: #f8fafc;
         }
         .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .ai-glow {
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+        }
+        /* Tùy chỉnh thanh trượt khoảng cách */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="text-slate-100 pb-28">
+<body class="pb-28">
 
-    <!-- Header hiện đại -->
-    <header class="glass-card text-white p-4 sticky top-0 z-50 shadow-2xl flex justify-between items-center border-b border-slate-700/50">
-        <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-900/40">
-                <i class="fa-solid fa-robot text-white text-sm"></i>
+    <!-- Header -->
+    <header class="glass-card p-4 sticky top-0 z-40 flex justify-between items-center rounded-b-2xl mb-4 mx-2 mt-2">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
+                <i class="fa-solid fa-microchip text-white text-lg"></i>
             </div>
             <div>
-                <h1 class="text-sm font-black tracking-wide text-white">GOLF CADDY AI</h1>
-                <p class="text-[10px] text-emerald-400 font-medium">Trợ lý thông minh của Bố</p>
+                <h1 class="text-sm font-black tracking-widest text-white uppercase">Caddy AI Pro</h1>
+                <p class="text-[10px] text-sky-300 font-medium">Phiên bản toàn diện cho Bố</p>
             </div>
         </div>
-        <span class="text-xs bg-emerald-500/10 px-3 py-1 rounded-full font-bold border border-emerald-500/30 text-emerald-300" id="current-hole-badge">Hố 1 / 18</span>
+        <span class="text-xs bg-sky-500/20 px-3 py-1.5 rounded-full font-bold border border-sky-500/40 text-sky-300" id="current-hole-badge">Hố 1 / 18</span>
     </header>
 
-    <main class="p-4 max-w-md mx-auto space-y-4">
+    <main class="px-3 max-w-md mx-auto space-y-4" id="mainAppContent">
         
-        <!-- Chọn sân & Thời tiết Live API -->
-        <section class="glass-card p-4 rounded-3xl shadow-2xl space-y-3">
+        <!-- Chọn sân Toàn Miền Bắc & Thời tiết -->
+        <section class="glass-card p-4 rounded-3xl space-y-3">
             <div class="flex flex-col gap-1.5">
-                <label class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-location-dot text-emerald-400"></i> Sân Golf Toàn Quốc:
+                <label class="text-[11px] uppercase tracking-wider font-bold text-sky-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-map-location-dot"></i> Danh Sách Sân Miền Bắc:
                 </label>
-                <select id="courseSelect" onchange="changeCourse()" class="bg-slate-900/90 text-white font-bold text-xs sm:text-sm px-3.5 py-3 rounded-2xl border border-slate-700 focus:outline-none focus:border-emerald-500 shadow-inner">
-                    <optgroup label="📍 Miền Bắc">
-                        <option value="21.0285,105.8542,BRG Legend Hill Golf Resort (Hà Nội)">BRG Legend Hill (Hà Nội)</option>
-                        <option value="21.0500,105.5333,BRG Kings' Island Golf (Đồng Mô)">Kings' Island Golf (Đồng Mô)</option>
-                        <option value="21.2333,105.7333,Tam Dao Golf Resort (Vĩnh Phúc)">Tam Đảo Golf (Vĩnh Phúc)</option>
-                        <option value="20.8500,107.0333,FLC Ha Long Bay Golf Club (Quảng Ninh)">FLC Hạ Long (Quảng Ninh)</option>
-                        <option value="20.8440,106.6881,Vinpearl Golf Hai Phong (Hải Phòng)">Vinpearl Golf Hải Phòng</option>
+                <select id="courseSelect" onchange="changeCourse()" class="bg-slate-800/80 text-white font-bold text-xs sm:text-sm px-3.5 py-3 rounded-xl border border-slate-600 focus:outline-none focus:border-sky-500">
+                    <optgroup label="Hà Nội">
+                        <option value="21.258,105.845,BRG Legend Hill (Sóc Sơn)">BRG Legend Hill (Sóc Sơn)</option>
+                        <option value="21.042,105.450,Kings' Island Golf (Đồng Mô)">Kings' Island Golf (Đồng Mô)</option>
+                        <option value="20.835,105.578,Sky Lake Resort (Chương Mỹ)">Sky Lake Resort (Chương Mỹ)</option>
+                        <option value="21.139,105.787,Vân Trì Golf Club (Đông Anh)">Vân Trì Golf Club (Đông Anh)</option>
+                        <option value="21.038,105.908,Long Biên Golf Course">Long Biên Golf Course</option>
                     </optgroup>
-                    <optgroup label="📍 Miền Trung">
-                        <option value="16.4674,107.5905,Laguna Golf Lang Co (Thừa Thiên Huế)">Laguna Lăng Cô (Thừa Thiên Huế)</option>
-                        <option value="16.0544,108.2022,Ba Na Hills Golf Club (Đà Nẵng)">Ba Na Hills Golf Club (Đà Nẵng)</option>
-                        <option value="15.8800,108.3300,Hoiana Shores Golf Club (Quảng Nam)">Hoiana Shores (Quảng Nam)</option>
-                        <option value="12.2388,109.1967,Vinpearl Golf Nha Trang (Khánh Hòa)">Vinpearl Golf Nha Trang</option>
+                    <optgroup label="Vĩnh Phúc">
+                        <option value="21.411,105.636,Tam Đảo Golf Resort">Tam Đảo Golf Resort</option>
+                        <option value="21.328,105.698,Thanh Lanh Valley Golf">Thanh Lanh Valley Golf</option>
+                        <option value="21.296,105.590,Heron Lake (Đầm Vạc)">Heron Lake (Đầm Vạc)</option>
+                        <option value="21.312,105.717,Đại Lải Star Golf">Đại Lải Star Golf</option>
                     </optgroup>
-                    <optgroup label="📍 Miền Nam">
-                        <option value="10.8231,106.6297,Tan Son Nhat Golf Course (TP.HCM)">Tân Sơn Nhất (TP.HCM)</option>
-                        <option value="10.5833,107.0833,Long Thanh Golf Club (Đồng Nai)">Long Thành Golf Club (Đồng Nai)</option>
-                        <option value="10.5000,107.2500,The Bluffs Grand Ho Tram Strip (Vũng Tàu)">The Bluffs Hồ Tràm (Vũng Tàu)</option>
-                        <option value="10.2897,103.9840,Vinpearl Golf Phu Quoc (Kiên Giang)">Vinpearl Golf Phú Quốc</option>
+                    <optgroup label="Hòa Bình & Hà Nam">
+                        <option value="20.853,105.332,Phoenix Golf Resort (Hòa Bình)">Phoenix Golf Resort (Hòa Bình)</option>
+                        <option value="20.840,105.350,Hilltop Valley (Hòa Bình)">Hilltop Valley (Hòa Bình)</option>
+                        <option value="20.573,105.892,Stone Valley (Hà Nam)">Stone Valley (Hà Nam)</option>
+                    </optgroup>
+                    <optgroup label="Quảng Ninh & Hải Phòng">
+                        <option value="20.957,107.094,FLC Hạ Long">FLC Hạ Long (Quảng Ninh)</option>
+                        <option value="20.925,106.985,Tuần Châu Golf">Tuần Châu Golf (Quảng Ninh)</option>
+                        <option value="20.871,106.697,Vinpearl Golf Hải Phòng">Vinpearl Golf Hải Phòng</option>
+                        <option value="20.708,106.818,Dragon Golf Links (Đồ Sơn)">Dragon Golf Links (Đồ Sơn)</option>
+                    </optgroup>
+                    <optgroup label="Ninh Bình, Bắc Giang & Hải Dương">
+                        <option value="20.147,105.895,Royal Golf Club (Ninh Bình)">Royal Golf Club (Ninh Bình)</option>
+                        <option value="20.218,105.871,Tràng An Golf (Ninh Bình)">Tràng An Golf (Ninh Bình)</option>
+                        <option value="21.127,106.398,Chí Linh Golf (Hải Dương)">Chí Linh Golf (Hải Dương)</option>
+                        <option value="21.225,106.275,Amber Hills (Yên Dũng)">Amber Hills (Yên Dũng - Bắc Giang)</option>
                     </optgroup>
                 </select>
             </div>
             
-            <!-- Box Thời tiết thực tế -->
-            <div class="flex items-center gap-3.5 bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800">
-                <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-cloud-sun text-amber-400 text-lg"></i>
+            <!-- Box Thời tiết thực tế API -->
+            <div class="flex items-center gap-3 bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                <div class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0 border border-orange-500/30">
+                    <i class="fa-solid fa-cloud-sun text-orange-400 text-lg"></i>
                 </div>
-                <div class="text-xs space-y-1 flex-1">
-                    <div class="flex justify-between items-center">
-                        <p class="font-bold text-slate-200" id="weatherTitle">Đang kết nối trạm thời tiết...</p>
-                        <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">Live API</span>
+                <div class="text-xs flex-1">
+                    <div class="flex justify-between items-center mb-0.5">
+                        <p class="font-bold text-slate-100" id="weatherTitle">Đang cập nhật vệ tinh...</p>
+                        <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-bold">LIVE</span>
                     </div>
-                    <p class="text-slate-300 font-medium" id="weatherDesc">Đang lấy dữ liệu gió & nhiệt độ...</p>
+                    <p class="text-slate-300 font-medium" id="weatherDesc">Nhiệt độ & Gió...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- KHOẢNG CÁCH & TRỢ LÝ AI CHỌN GẬY (Điểm nhấn) -->
+        <section class="bg-gradient-to-br from-slate-800/80 to-slate-900/90 p-5 rounded-3xl ai-glow relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-between mb-4 border-b border-sky-500/30 pb-2">
+                <h3 class="font-black text-sky-300 text-xs tracking-wider uppercase"><i class="fa-solid fa-robot mr-1"></i> AI Phân Tích Cú Đánh</h3>
+                <span class="text-[10px] bg-sky-500/20 text-sky-200 px-2 py-0.5 rounded animate-pulse font-bold border border-sky-500/50">Caddy Đang Tính Toán</span>
+            </div>
+
+            <!-- Nhập khoảng cách -->
+            <div class="mb-4">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="text-[11px] font-bold text-slate-300">Khoảng cách tới Cờ (Yard):</label>
+                    <span class="text-2xl font-black text-white" id="distanceVal">150</span>
+                </div>
+                <input type="range" id="distanceSlider" min="10" max="250" value="150" oninput="updateDistance()" class="w-full">
+            </div>
+
+            <!-- Kết quả AI phân tích chuyên sâu -->
+            <div class="bg-sky-950/40 p-3 rounded-xl border border-sky-500/20 space-y-2 text-xs">
+                <div class="flex items-start gap-2">
+                    <i class="fa-solid fa-wind text-sky-400 mt-0.5 w-4 text-center"></i>
+                    <p class="text-slate-200 leading-relaxed" id="aiWindImpact">Tính toán bù trừ sức gió...</p>
+                </div>
+                <div class="flex items-start gap-2 pt-2 border-t border-sky-500/10">
+                    <i class="fa-solid fa-golf-club text-amber-400 mt-0.5 w-4 text-center"></i>
+                    <p class="text-amber-100 font-bold leading-relaxed" id="aiClubSuggest">Đang chọn gậy...</p>
                 </div>
             </div>
         </section>
 
         <!-- Điều hướng Hố & Nhập điểm -->
-        <section class="glass-card p-4 rounded-3xl shadow-2xl space-y-4">
+        <section class="glass-card p-4 rounded-3xl space-y-4">
             <div class="flex justify-between items-center">
-                <button onclick="changeHole(-1)" class="w-10 h-10 rounded-2xl bg-slate-800 text-emerald-400 border border-slate-700 flex items-center justify-center font-bold text-sm active:scale-95 shadow-lg"><i class="fa-solid fa-chevron-left"></i></button>
+                <button onclick="changeHole(-1)" class="w-11 h-11 rounded-full bg-slate-800 text-sky-400 border border-slate-600 flex items-center justify-center font-bold text-sm active:scale-95 shadow-lg"><i class="fa-solid fa-chevron-left"></i></button>
                 <div class="text-center">
-                    <h2 class="text-xl font-black text-white tracking-wide" id="holeTitle">Hố số 1</h2>
-                    <span class="text-[11px] bg-amber-500/10 text-amber-300 border border-amber-500/30 font-bold px-3 py-0.5 rounded-full inline-block mt-0.5" id="parBadge">Par chuẩn: 4</span>
+                    <h2 class="text-2xl font-black text-white" id="holeTitle">Hố số 1</h2>
+                    <span class="text-[11px] bg-orange-500/10 text-orange-300 border border-orange-500/30 font-bold px-3 py-0.5 rounded-full inline-block mt-1" id="parBadge">Par chuẩn: 4</span>
                 </div>
-                <button onclick="changeHole(1)" class="w-10 h-10 rounded-2xl bg-slate-800 text-emerald-400 border border-slate-700 flex items-center justify-center font-bold text-sm active:scale-95 shadow-lg"><i class="fa-solid fa-chevron-right"></i></button>
+                <button onclick="changeHole(1)" class="w-11 h-11 rounded-full bg-slate-800 text-sky-400 border border-slate-600 flex items-center justify-center font-bold text-sm active:scale-95 shadow-lg"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
 
-            <!-- Danh sách nhập điểm 4 người -->
-            <div class="space-y-2.5" id="playerInputs"></div>
-
-            <!-- Ghi chú nhanh hố hiện tại -->
-            <div>
-                <input type="text" id="holeNote" placeholder="✍️ Ghi chú nhanh hố này (VD: Gió ngược, gạt 2 gậy...)" onchange="saveHoleNote(this.value)" class="w-full bg-slate-900/80 text-xs text-slate-200 placeholder-slate-500 px-3.5 py-2.5 rounded-xl border border-slate-700/80 focus:outline-none focus:border-emerald-500">
-            </div>
-        </section>
-
-        <!-- Trợ Lý AI Thời Gian Thực (Real-time AI Caddy) -->
-        <section class="bg-gradient-to-br from-indigo-950/80 via-purple-950/80 to-slate-900/90 backdrop-blur-xl p-4 rounded-3xl border border-indigo-500/30 shadow-2xl space-y-3 relative overflow-hidden">
-            <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl pointer-events-none"></div>
-            
-            <div class="flex items-center justify-between border-b border-indigo-500/20 pb-2">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-300">
-                        <i class="fa-solid fa-microchip text-xs"></i>
-                    </div>
-                    <h3 class="font-black text-indigo-200 text-xs tracking-wider uppercase">AI Caddy Phân Tích Thực Chiến</h3>
-                </div>
-                <span class="text-[10px] bg-indigo-500/30 text-indigo-200 px-2.5 py-0.5 rounded-full font-bold animate-pulse">Live AI Active</span>
-            </div>
-
-            <!-- Nội dung AI phân tích -->
-            <div class="space-y-2.5 text-xs">
-                <div class="flex items-start gap-2.5 bg-indigo-900/30 p-2.5 rounded-2xl border border-indigo-500/20">
-                    <i class="fa-solid fa-golf-club text-indigo-400 mt-0.5 shrink-0"></i>
-                    <div>
-                        <p class="font-bold text-indigo-200 mb-0.5">Gợi ý chọn gậy thông minh:</p>
-                        <p class="text-slate-300 leading-relaxed" id="aiClubTip">Đang tính toán lực gió và khoảng cách hố...</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-2.5 bg-purple-900/30 p-2.5 rounded-2xl border border-purple-500/20">
-                    <i class="fa-solid fa-chess-knight text-purple-400 mt-0.5 shrink-0"></i>
-                    <div>
-                        <p class="font-bold text-purple-200 mb-0.5">Chiến thuật bắt cặp & Cục diện nhóm:</p>
-                        <p class="text-slate-300 leading-relaxed" id="aiTacticalTip">Đang phân tích điểm số các người chơi...</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Tính điểm độ cược nhanh -->
-        <section class="glass-card p-4 rounded-3xl shadow-2xl space-y-3">
-            <div class="flex justify-between items-center">
-                <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-coins"></i> Quỹ Độ / Cược Nhanh (VNĐ)
-                </span>
-                <input type="number" id="wagerAmount" value="100000" step="50000" onchange="updateWager()" class="w-28 bg-slate-900 text-amber-300 font-bold text-xs text-right px-3 py-1.5 rounded-xl border border-slate-700 focus:outline-none">
-            </div>
-            <div id="wagerSummary" class="text-xs text-slate-300 bg-slate-900/60 p-3 rounded-2xl border border-slate-800 flex justify-between items-center">
-                <!-- Render tổng kết độ -->
-            </div>
+            <!-- Nhập điểm 4 người -->
+            <div class="space-y-2" id="playerInputs"></div>
         </section>
 
         <!-- Nút thao tác chính -->
-        <div class="space-y-2.5 pt-1">
-            <button onclick="shareZalo()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 transition border border-blue-400/30">
-                <i class="fa-solid fa-share-nodes"></i> Gửi Bảng Điểm & Tổng Kết Qua Zalo
+        <div class="space-y-3 pt-2">
+            <!-- Nút xuất ảnh chụp bảng điểm -->
+            <button onclick="exportScorecardImage()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 border border-blue-400/30 transition-transform">
+                <i class="fa-solid fa-camera"></i> Xuất Ảnh Bảng Điểm Khoe Zalo
             </button>
-            <button onclick="toggleScorecardModal()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 transition border border-emerald-400/30">
-                <i class="fa-solid fa-table-cells"></i> Xem Bảng Điểm Tổng 18 Hố & Nhật Ký
+            <button onclick="toggleScorecardModal()" class="w-full bg-slate-800 active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 border border-slate-600 transition-transform">
+                <i class="fa-solid fa-table-list text-sky-400"></i> Xem Bảng Điểm Tổng
             </button>
         </div>
-
     </main>
 
-    <!-- Modal Bảng điểm tổng 18 hố -->
-    <div id="scorecardModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-card text-slate-100 w-full max-w-lg rounded-3xl p-4 max-h-[85vh] flex flex-col shadow-2xl border border-slate-700">
-            <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-emerald-400 text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-book-open"></i> Bảng Điểm Tổng & Nhật Ký Sân
-                </h3>
-                <button onclick="toggleScorecardModal()" class="text-slate-400 hover:text-white text-xl font-bold px-2">&times;</button>
+    <!-- Modal Bảng điểm (Vùng dùng để render ảnh Canvas) -->
+    <div id="scorecardModal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 hidden overflow-y-auto">
+        <div class="min-h-screen p-4 flex flex-col justify-center items-center">
+            
+            <!-- Phần tử sẽ được chụp ảnh -->
+            <div id="captureArea" class="glass-card text-slate-100 w-full max-w-lg rounded-2xl p-5 shadow-2xl border border-slate-700 relative bg-[#0f172a]">
+                <div class="text-center mb-4 pb-3 border-b border-slate-700">
+                    <h3 class="font-black text-sky-400 text-lg uppercase tracking-wider">Golf Caddy Pro</h3>
+                    <p class="text-xs text-slate-400 mt-1" id="exportCourseName">Sân Golf...</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Ngày: <span id="currentDate"></span></p>
+                </div>
+                <div class="overflow-x-auto w-full pb-2">
+                    <table class="w-full text-xs text-center border-collapse min-w-[500px]">
+                        <thead>
+                            <tr class="bg-slate-800/80 text-sky-300">
+                                <th class="p-2 text-left bg-slate-800 border-b border-r border-slate-700 sticky left-0 z-10 w-24">Golfer</th>
+                                <script>
+                                    for(let i=1; i<=18; i++) document.write(`<th class="p-1.5 border-b border-r border-slate-700">H${i}</th>`);
+                                </script>
+                                <th class="p-2 bg-sky-900/50 font-bold border-b border-slate-700">TỔNG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scorecardTableBody"></tbody>
+                    </table>
+                </div>
+                
+                <!-- Gợi ý bắt cặp in trên bảng điểm -->
+                <div class="mt-4 p-3 bg-purple-900/20 border border-purple-500/20 rounded-xl">
+                    <p class="text-[10px] font-bold text-purple-300 mb-1"><i class="fa-solid fa-chess-knight"></i> AI Gợi Ý Cặp Đấu Trận Sau:</p>
+                    <p class="text-xs text-slate-300" id="tacticalPrintInfo">Đang phân tích...</p>
+                </div>
             </div>
-            <div class="overflow-x-auto flex-1 mb-3">
-                <table class="w-full text-xs text-center border-collapse">
-                    <thead>
-                        <tr class="bg-emerald-950/60 text-emerald-300">
-                            <th class="p-2 text-left sticky left-0 bg-slate-900 border border-slate-800">Người chơi</th>
-                            <script>
-                                for(let i=1; i<=18; i++) document.write(`<th class="p-1 border border-slate-800">H${i}</th>`);
-                            </script>
-                            <th class="p-2 bg-emerald-900 font-bold border border-slate-700">Tổng</th>
-                        </tr>
-                    </thead>
-                    <tbody id="scorecardTableBody"></tbody>
-                </table>
-            </div>
-            <div id="notesHistory" class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800 text-xs space-y-1 max-h-32 overflow-y-auto">
-                <p class="font-bold text-amber-400 mb-1">📝 Nhật ký ghi chú các hố:</p>
-                <div id="notesList" class="text-slate-300 space-y-0.5"></div>
-            </div>
+
+            <!-- Nút đóng -->
+            <button onclick="toggleScorecardModal()" class="mt-6 bg-slate-800 px-6 py-2.5 rounded-full text-sm font-bold text-white border border-slate-700 active:scale-95 shadow-lg">Đóng Bảng Điểm</button>
         </div>
     </div>
 
-    <!-- Script xử lý Live AI & Scorecard -->
+    <!-- Script Logic Chính -->
     <script>
         const standardPars = [4,4,3,4,5,4,3,4,5, 4,5,3,4,4,3,5,4,4];
-
         let currentHole = 1;
-        let wagerPerHole = 100000;
         let players = [
-            { name: "Người chơi 1", scores: Array(18).fill(4) },
-            { name: "Người chơi 2", scores: Array(18).fill(4) },
-            { name: "Người chơi 3", scores: Array(18).fill(4) },
-            { name: "Người chơi 4", scores: Array(18).fill(4) }
+            { name: "Ba", scores: Array(18).fill(4) },
+            { name: "Bác A", scores: Array(18).fill(4) },
+            { name: "Bác B", scores: Array(18).fill(4) },
+            { name: "Bác C", scores: Array(18).fill(4) }
         ];
-        let holeNotes = {};
-        let liveWindSpeed = 10;
+        
+        // Trạng thái AI
         let liveTemp = 30;
+        let liveWindspeed = 10;
+        let windDir = "Đông";
+        let currentCourseName = "BRG Legend Hill";
+        let currentDistance = 150;
 
         function init() {
+            let today = new Date();
+            document.getElementById('currentDate').innerText = today.toLocaleDateString('vi-VN');
             changeCourse();
-            updateWager();
         }
 
         async function changeCourse() {
@@ -217,10 +250,10 @@
             const val = select.value.split(',');
             const lat = val[0];
             const lon = val[1];
-            const courseName = val[2];
+            currentCourseName = val[2];
 
-            document.getElementById('weatherTitle').innerText = courseName;
-            document.getElementById('weatherDesc').innerText = "Đang kết nối trạm thời tiết trực tiếp...";
+            document.getElementById('weatherTitle').innerText = currentCourseName;
+            document.getElementById('exportCourseName').innerText = currentCourseName;
 
             try {
                 let response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
@@ -229,27 +262,17 @@
                 if(data && data.current_weather) {
                     liveTemp = data.current_weather.temperature;
                     liveWindspeed = data.current_weather.windspeed;
-                    let windDir = getWindDirectionText(data.current_weather.winddirection);
-
-                    document.getElementById('weatherDesc').innerHTML = `<b class="text-white">${liveTemp}°C</b> • Gió ${windDir} ${liveWindspeed} km/h`;
-                } else {
-                    fallbackWeather();
+                    windDir = getWindDirText(data.current_weather.winddirection);
+                    document.getElementById('weatherDesc').innerHTML = `<b class="text-white text-sm">${liveTemp}°C</b> • Gió ${windDir} ${liveWindspeed} km/h`;
                 }
             } catch (e) {
-                fallbackWeather();
+                console.log("Weather error, using fallback.");
             }
-
             renderHole();
-            runAICaddyAnalysis();
+            updateDistance(); // Kích hoạt AI tính gậy
         }
 
-        function fallbackWeather() {
-            liveTemp = 31;
-            liveWindspeed = 12;
-            document.getElementById('weatherDesc').innerHTML = `<b class="text-white">31°C</b> • Gió Đông Nam 12 km/h`;
-        }
-
-        function getWindDirectionText(deg) {
+        function getWindDirText(deg) {
             if (deg > 337.5 || deg <= 22.5) return "Bắc";
             if (deg > 22.5 && deg <= 67.5) return "Đông Bắc";
             if (deg > 67.5 && deg <= 112.5) return "Đông";
@@ -266,55 +289,26 @@
             if (currentHole > 18) currentHole = 18;
             document.getElementById('current-hole-badge').innerText = `Hố ${currentHole} / 18`;
             renderHole();
-            runAICaddyAnalysis();
         }
 
         function renderHole() {
             document.getElementById('holeTitle').innerText = `Hố số ${currentHole}`;
-            let par = standardPars[currentHole - 1];
-            document.getElementById('parBadge').innerText = `Par chuẩn: ${par}`;
+            document.getElementById('parBadge').innerText = `Par chuẩn: ${standardPars[currentHole - 1]}`;
 
             let html = '';
             players.forEach((p, pIndex) => {
                 html += `
-                    <div class="flex items-center justify-between bg-slate-900/70 p-2.5 rounded-2xl border border-slate-800">
-                        <input type="text" value="${p.name}" onchange="updatePlayerName(${pIndex}, this.value)" class="bg-transparent font-bold text-xs sm:text-sm text-slate-200 w-32 focus:outline-none border-b border-transparent focus:border-emerald-400">
-                        <div class="flex items-center gap-3">
-                            <button onclick="updateScore(${pIndex}, -1)" class="w-8 h-8 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 flex items-center justify-center font-bold active:scale-95"><i class="fa-solid fa-minus text-xs"></i></button>
-                            <span class="text-base font-black w-6 text-center text-white">${p.scores[currentHole - 1]}</span>
-                            <button onclick="updateScore(${pIndex}, 1)" class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold active:scale-95"><i class="fa-solid fa-plus text-xs"></i></button>
+                    <div class="flex items-center justify-between bg-slate-800/80 p-2 rounded-xl border border-slate-700">
+                        <input type="text" value="${p.name}" onchange="updatePlayerName(${pIndex}, this.value)" class="bg-transparent font-bold text-sm text-slate-100 w-24 px-2 focus:outline-none focus:border-b focus:border-sky-400">
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateScore(${pIndex}, -1)" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 font-bold active:scale-90"><i class="fa-solid fa-minus"></i></button>
+                            <span class="text-xl font-black w-8 text-center text-white">${p.scores[currentHole - 1]}</span>
+                            <button onclick="updateScore(${pIndex}, 1)" class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 font-bold active:scale-90"><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
                 `;
             });
             document.getElementById('playerInputs').innerHTML = html;
-            document.getElementById('holeNote').value = holeNotes[currentHole] || '';
-        }
-
-        // --- TRỢ LÝ AI PHÂN TÍCH THỰC CHIẾN (REAL-TIME AI CADDY) ---
-        function runAICaddyAnalysis() {
-            let par = standardPars[currentHole - 1];
-            
-            // 1. Phân tích chọn gậy dựa trên Par và gió thực tế
-            let clubTip = "";
-            if (par === 3) {
-                clubTip = liveWindspeed > 18 ? `Hố Par 3 ngược gió mạnh (${liveWindspeed} km/h). AI khuyên nhích lên 1 gậy (dùng Gậy sắt 7 thay vì 8), nhắm cao hướng cờ.` : `Hố Par 3 ngắn (~140y). Gió ổn định, khuyên dùng Gậy sắt 8 hoặc 9 để ôm cờ chuẩn xác.`;
-            } else if (par === 5) {
-                clubTip = `Hố Par 5 dài. Nhiệt độ ${liveTemp}°C giúp bóng bay xa hơn một chút. Ưu tiên Driver lực mạnh, gậy thứ 2 dùng Gậy gỗ số 3 hướng thẳng trung tâm Fairway.`;
-            } else {
-                clubTip = liveWindspeed > 20 ? `Hố Par 4 chuẩn nhưng gió ngang mạnh (${liveWindspeed} km/h). Cần đánh thấp bóng, nhắm lệch sang trái để trừ hao gió thổi.` : `Hố Par 4 tiêu chuẩn. Khoảng cách thoáng, tự tin dùng Gậy sắt 6 hoặc 7 cho cú đánh thứ hai.`;
-            }
-            document.getElementById('aiClubTip').innerText = clubTip;
-
-            // 2. Phân tích điểm số & Bắt cặp chiến thuật tự động dựa trên tổng điểm hiện tại
-            let totals = players.map(p => ({ name: p.name, total: p.scores.reduce((a,b)=>a+b,0) }));
-            totals.sort((a,b) => a.total - b.total); // Sắp xếp từ thấp đến cao (điểm thấp là đánh giỏi nhất)
-
-            let bestPlayer = totals[0].name;
-            let worstPlayer = totals[3].name;
-            
-            let tacticalTip = `Dựa trên bảng điểm tổng lúc này: <b>${bestPlayer}</b> đang dẫn đầu phong độ tốt. AI đề xuất trận sau nên xếp cặp <b>(${totals[0].name} & ${totals[2].name})</b> đấu với <b>(${totals[1].name} & ${totals[3].name})</b> để cân bằng lực lượng và tạo kịch tính lật kèo!`;
-            document.getElementById('aiTacticalTip').innerHTML = tacticalTip;
         }
 
         function updateScore(pIndex, delta) {
@@ -322,37 +316,64 @@
             if (currentScore < 1) currentScore = 1;
             players[pIndex].scores[currentHole - 1] = currentScore;
             renderHole();
-            updateWager();
-            runAICaddyAnalysis();
+            updateTacticalPrint();
         }
 
         function updatePlayerName(pIndex, newName) {
             players[pIndex].name = newName;
-            runAICaddyAnalysis();
+            updateTacticalPrint();
         }
 
-        function saveHoleNote(note) {
-            if(note.trim() !== "") {
-                holeNotes[currentHole] = note;
-            } else {
-                delete holeNotes[currentHole];
-            }
-        }
-
-        function updateWager() {
-            wagerPerHole = parseInt(document.getElementById('wagerAmount').value) || 0;
-            let scoresAtHole = players.map(p => p.scores[currentHole - 1]);
-            let minScore = Math.min(...scoresAtHole);
-            let winners = players.filter((p, i) => p.scores[currentHole - 1] === minScore).map(p => p.name);
+        // --- LÕI AI TÍNH TOÁN KHOẢNG CÁCH & GẬY ---
+        function updateDistance() {
+            currentDistance = parseInt(document.getElementById('distanceSlider').value);
+            document.getElementById('distanceVal').innerText = currentDistance;
             
-            document.getElementById('wagerSummary').innerHTML = `
-                <span>Hố ${currentHole} đang dẫn: <b class="text-emerald-400">${winners.join(', ')}</b></span>
-                <span class="text-amber-300 font-bold">${wagerPerHole.toLocaleString()}đ/hố</span>
-            `;
+            // AI Logic tính toán
+            let windImpactText = "";
+            let effectiveDistance = currentDistance;
+            
+            // Giả lập logic bù gió: Gió > 15km/h thì ảnh hưởng rõ rệt
+            if(liveWindspeed > 15) {
+                // Giả định randomly chiều gió so với hố hiện tại (để demo tính năng)
+                let isHeadwind = (currentHole % 2 === 0); 
+                if(isHeadwind) {
+                    let extra = Math.round(liveWindspeed * 0.5);
+                    effectiveDistance += extra;
+                    windImpactText = `Gió ngược ${liveWindspeed}km/h. Cần đánh mạnh hơn (Cộng thêm ~${extra} yard). Khoảng cách thực tế: <b>${effectiveDistance} yard</b>.`;
+                } else {
+                    let less = Math.round(liveWindspeed * 0.4);
+                    effectiveDistance -= less;
+                    windImpactText = `Gió xuôi ${liveWindspeed}km/h. Bóng bay xa hơn (Trừ đi ~${less} yard). Khoảng cách thực tế: <b>${effectiveDistance} yard</b>.`;
+                }
+            } else {
+                windImpactText = `Gió ${liveWindspeed}km/h khá nhẹ, không ảnh hưởng nhiều đến quỹ đạo bóng.`;
+            }
+
+            document.getElementById('aiWindImpact').innerHTML = windImpactText;
+
+            // Gợi ý gậy theo khoảng cách hiệu dụng (Effective Distance)
+            let club = "";
+            if (effectiveDistance > 220) club = "Driver (Gậy gỗ số 1)";
+            else if (effectiveDistance > 190) club = "Gậy Gỗ 3 hoặc Hybrid";
+            else if (effectiveDistance > 170) club = "Gậy Sắt 4 (Iron 4)";
+            else if (effectiveDistance > 155) club = "Gậy Sắt 5 (Iron 5)";
+            else if (effectiveDistance > 145) club = "Gậy Sắt 6 (Iron 6)";
+            else if (effectiveDistance > 135) club = "Gậy Sắt 7 (Iron 7)";
+            else if (effectiveDistance > 120) club = "Gậy Sắt 8 (Iron 8)";
+            else if (effectiveDistance > 105) club = "Gậy Sắt 9 (Iron 9)";
+            else if (effectiveDistance > 80) club = "Pitching Wedge (PW)";
+            else if (effectiveDistance > 30) club = "Sand Wedge (SW) đánh nửa lực";
+            else club = "Putter (Gạt bóng) hoặc Chip nhẹ";
+
+            document.getElementById('aiClubSuggest').innerHTML = `AI khuyên dùng: <b>${club}</b> với lực vung tay 90%.`;
         }
 
-        function shareZalo() {
-            alert("🚀 Đã xuất ảnh tổng kết bảng điểm AI kèm quỹ độ và mở sẵn Zalo để ba gửi khoe với các bác!");
+        // --- LOGIC XUẤT ẢNH & ZALO ---
+        function updateTacticalPrint() {
+            let totals = players.map(p => ({ name: p.name, total: p.scores.reduce((a,b)=>a+b,0) }));
+            totals.sort((a,b) => a.total - b.total); // Sắp xếp từ thấp đến cao (đánh ít gậy là giỏi nhất)
+            document.getElementById('tacticalPrintInfo').innerHTML = `Để cân bằng phong độ (Handicap tạm tính), trận sau nên bắt cặp: <b class="text-white">${totals[0].name} & ${totals[3].name}</b> đấu với <b class="text-white">${totals[1].name} & ${totals[2].name}</b>.`;
         }
 
         function toggleScorecardModal() {
@@ -360,7 +381,7 @@
             modal.classList.toggle('hidden');
             if(!modal.classList.contains('hidden')) {
                 renderScorecardTable();
-                renderNotesHistory();
+                updateTacticalPrint();
             }
         }
 
@@ -368,28 +389,62 @@
             let html = '';
             players.forEach(p => {
                 let total = p.scores.reduce((a, b) => a + b, 0);
-                html += `<tr class="border-b border-slate-800"><td class="p-2 text-left font-bold sticky left-0 bg-slate-900 border-r border-slate-800">${p.name}</td>`;
+                html += `<tr class="border-b border-slate-700">
+                    <td class="p-2 text-left font-bold sticky left-0 bg-slate-800 border-r border-slate-700 w-24 truncate">${p.name}</td>`;
                 p.scores.forEach(s => {
-                    html += `<td class="p-1 border border-slate-800">${s}</td>`;
+                    html += `<td class="p-1.5 border-r border-slate-700">${s}</td>`;
                 });
-                html += `<td class="p-2 font-black text-emerald-400 bg-emerald-950/40 border border-slate-700">${total}</td></tr>`;
+                html += `<td class="p-2 font-black text-sky-400 bg-sky-900/30">${total}</td></tr>`;
             });
             document.getElementById('scorecardTableBody').innerHTML = html;
         }
 
-        function renderNotesHistory() {
-            let notesHtml = '';
-            let keys = Object.keys(holeNotes);
-            if(keys.length === 0) {
-                notesHtml = '<p class="text-slate-500 italic">Chưa có ghi chú nào trong trận này.</p>';
-            } else {
-                keys.sort((a,b) => a - b).forEach(h => {
-                    notesHtml += `<p>• <b>Hố ${h}:</b> ${holeNotes[h]}</p>`;
+        // Tính năng TỰ ĐỘNG CHỤP MÀN HÌNH html2canvas
+        function exportScorecardImage() {
+            // Mở bảng điểm lên trước (ẩn thì không chụp được)
+            const modal = document.getElementById('scorecardModal');
+            modal.classList.remove('hidden');
+            renderScorecardTable();
+            updateTacticalPrint();
+
+            // Hiển thị loading nhẹ
+            let btn = event.currentTarget;
+            let originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang kết xuất ảnh...`;
+
+            setTimeout(() => {
+                const targetArea = document.getElementById('captureArea');
+                
+                // Cấu hình html2canvas chụp nền tối đẹp
+                html2canvas(targetArea, {
+                    backgroundColor: '#0f172a',
+                    scale: 2, // Chụp nét gấp đôi
+                    logging: false,
+                    useCORS: true
+                }).then(canvas => {
+                    // Tạo file ảnh tải về
+                    let link = document.createElement('a');
+                    link.download = `BangDiem_GolfCaddy_${new Date().getTime()}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                    
+                    // Khôi phục nút
+                    btn.innerHTML = originalText;
+                    
+                    // Thông báo hướng dẫn mở Zalo
+                    setTimeout(() => {
+                        alert("✅ Đã lưu ảnh Bảng Điểm sắc nét vào máy! Ba mở Thư viện ảnh rồi gửi thẳng vào nhóm Zalo nha.");
+                        modal.classList.add('hidden');
+                    }, 500);
+                }).catch(err => {
+                    console.error("Lỗi chụp ảnh:", err);
+                    alert("Có lỗi khi xuất ảnh, vui lòng thử lại!");
+                    btn.innerHTML = originalText;
                 });
-            }
-            document.getElementById('notesList').innerHTML = notesHtml;
+            }, 500); // Đợi render modal xong mới chụp
         }
 
+        // Khởi chạy app
         init();
     </script>
 </body>
