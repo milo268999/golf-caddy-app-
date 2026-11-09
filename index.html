@@ -7,141 +7,302 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), url('https://images.unsplash.com/photo-1535131749006-b7f58c99034b?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 pb-20">
+<body class="text-slate-100 pb-24">
 
     <!-- Header -->
-    <header class="bg-emerald-700 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
-        <h1 class="text-lg font-bold"><i class="fa-solid fa-golf-ball-tee mr-2"></i> Golf Caddy của Bố</h1>
-        <span class="text-xs bg-emerald-800 px-2 py-1 rounded-full font-medium" id="current-hole-badge">Hố 1 / 18</span>
+    <header class="bg-emerald-800/90 backdrop-blur-md text-white p-4 sticky top-0 z-50 shadow-lg flex justify-between items-center border-b border-emerald-700">
+        <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-golf-ball-tee text-amber-400"></i> Golf Caddy của Bố</h1>
+        <span class="text-xs bg-emerald-900/80 px-3 py-1 rounded-full font-semibold border border-emerald-600 text-amber-300" id="current-hole-badge">Hố 1 / 18</span>
     </header>
 
     <main class="p-4 max-w-md mx-auto space-y-4">
         
-        <!-- Chọn sân & Thời tiết -->
-        <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-            <div class="flex justify-between items-center mb-3">
-                <label class="text-sm font-semibold text-slate-500">Sân Golf:</label>
-                <select id="courseSelect" onchange="changeCourse()" class="bg-emerald-50 text-emerald-800 font-bold text-sm px-3 py-1.5 rounded-lg border border-emerald-200 focus:outline-none">
-                    <option value="0">BRG Legend Hill (Hà Nội)</option>
-                    <option value="1">Vinpearl Golf (Nha Trang)</option>
-                    <option value="2">Tân Sơn Nhất (TP.HCM)</option>
-                    <option value="3">FLC Hạ Long (Quảng Ninh)</option>
-                    <option value="4">Da Nang Golf Club (Đà Nẵng)</option>
+        <!-- Chọn sân & Thời tiết theo giờ thực tế -->
+        <section class="bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-700/60 space-y-3">
+            <div class="flex justify-between items-center">
+                <label class="text-sm font-semibold text-emerald-400"><i class="fa-solid fa-location-dot mr-1"></i> Sân Golf:</label>
+                <select id="courseSelect" onchange="changeCourse()" class="bg-slate-800 text-white font-bold text-xs sm:text-sm px-3 py-2 rounded-xl border border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                    <optgroup label="Miền Bắc">
+                        <option value="0">BRG Legend Hill (Hà Nội)</option>
+                        <option value="1">Kings' Island Golf (Đồng Mô)</option>
+                        <option value="2">FLC Hạ Long (Quảng Ninh)</option>
+                        <option value="3">Vinpearl Golf Hải Phòng</option>
+                    </optgroup>
+                    <optgroup label="Miền Trung">
+                        <option value="4">Vinpearl Golf Nha Trang</option>
+                        <option value="5">Ba Na Hills Golf Club (Đà Nẵng)</option>
+                        <option value="6">Hoiana Shores Golf Club (Quảng Nam)</option>
+                    </optgroup>
+                    <optgroup label="Miền Nam">
+                        <option value="7">Tân Sơn Nhất (TP.HCM)</option>
+                        <option value="8">The Bluffs Grand Ho Tram (Vũng Tàu)</option>
+                        <option value="9">Vinpearl Golf Phú Quốc</option>
+                    </optgroup>
                 </select>
             </div>
             
-            <div id="weatherBox" class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100 mt-2">
-                <i class="fa-solid fa-sun text-amber-500 text-3xl"></i>
-                <div class="text-xs">
-                    <p class="font-bold text-slate-700" id="weatherTitle">Thời tiết tại Hà Nội</p>
-                    <p class="text-slate-500" id="weatherDesc">31°C • Gió Đông Nam 12 km/h • Độ ẩm 65%</p>
-                    <p class="text-emerald-600 font-bold mt-1" id="weatherTip">💡 Trời nắng đẹp, nhớ mang mũ và kem chống nắng ba nhé!</p>
+            <!-- Box Thời tiết chính theo giờ -->
+            <div id="weatherBox" class="flex items-center gap-3 bg-slate-800/70 p-3 rounded-xl border border-slate-700">
+                <i class="fa-solid fa-cloud-sun text-amber-400 text-3xl"></i>
+                <div class="text-xs space-y-1 flex-1">
+                    <div class="flex justify-between items-center">
+                        <p class="font-bold text-slate-200" id="weatherTitle">Thời tiết hiện tại</p>
+                        <span class="text-[10px] bg-emerald-600/30 text-emerald-300 px-2 py-0.5 rounded font-bold" id="weatherTimeLabel">Cập nhật lúc 07:00</span>
+                    </div>
+                    <p class="text-slate-300 font-medium" id="weatherDesc">30°C • Gió Đông Nam 10 km/h • Độ ẩm 68%</p>
+                    <p class="text-amber-300 text-[11px]" id="weatherTip">💡 Sáng sớm trời mát, gió nhẹ, rất thuận lợi phát bóng.</p>
+                </div>
+            </div>
+
+            <!-- Thanh chọn mốc giờ để xem trước thời tiết -->
+            <div>
+                <label class="text-[11px] text-slate-400 font-medium block mb-1.5"><i class="fa-regular fa-clock mr-1"></i> Xem trước thời tiết & hướng gió theo khung giờ ra sân:</label>
+                <div class="grid grid-cols-4 gap-1.5" id="hourlyButtons">
+                    <button onclick="setHourlyWeather(0)" id="btnHour0" class="bg-emerald-600 text-white text-xs py-1.5 rounded-lg font-bold border border-emerald-500">07:00 (Sáng)</button>
+                    <button onclick="setHourlyWeather(1)" id="btnHour1" class="bg-slate-800 text-slate-300 text-xs py-1.5 rounded-lg font-semibold border border-slate-700">10:00 (Trưa)</button>
+                    <button onclick="setHourlyWeather(2)" id="btnHour2" class="bg-slate-800 text-slate-300 text-xs py-1.5 rounded-lg font-semibold border border-slate-700">13:00 (Chiều)</button>
+                    <button onclick="setHourlyWeather(3)" id="btnHour3" class="bg-slate-800 text-slate-300 text-xs py-1.5 rounded-lg font-semibold border border-slate-700">16:00 (Chiều muộn)</button>
                 </div>
             </div>
         </section>
 
         <!-- Điều hướng Hố & Nhập điểm -->
-        <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <section class="bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-700/60">
             <div class="flex justify-between items-center mb-4">
-                <button onclick="changeHole(-1)" class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg active:scale-95"><i class="fa-solid fa-chevron-left"></i></button>
+                <button onclick="changeHole(-1)" class="w-10 h-10 rounded-full bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-bold text-lg active:scale-95"><i class="fa-solid fa-chevron-left"></i></button>
                 <div class="text-center">
-                    <h2 class="text-xl font-black text-slate-800" id="holeTitle">Hố số 1</h2>
-                    <span class="text-xs bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded" id="parBadge">Par chuẩn: 4</span>
+                    <h2 class="text-xl font-black text-white" id="holeTitle">Hố số 1</h2>
+                    <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold px-2.5 py-0.5 rounded-full" id="parBadge">Par chuẩn: 4</span>
                 </div>
-                <button onclick="changeHole(1)" class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg active:scale-95"><i class="fa-solid fa-chevron-right"></i></button>
+                <button onclick="changeHole(1)" class="w-10 h-10 rounded-full bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-bold text-lg active:scale-95"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
 
-            <div class="space-y-3" id="playerInputs">
-                <!-- Được render bằng JavaScript -->
+            <!-- Danh sách nhập điểm 4 người -->
+            <div class="space-y-3 mb-4" id="playerInputs"></div>
+
+            <!-- Ghi chú nhanh hố hiện tại -->
+            <div class="border-t border-slate-700/60 pt-3">
+                <input type="text" id="holeNote" placeholder="✍️ Ghi chú nhanh hố này (VD: Gió ngược, gạt 2 gậy...)" onchange="saveHoleNote(this.value)" class="w-full bg-slate-800/80 text-xs text-slate-200 placeholder-slate-400 px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500">
             </div>
         </section>
 
-        <!-- Quân sư chiến thuật -->
-        <section class="bg-purple-50 p-4 rounded-2xl border border-purple-200 shadow-sm">
+        <!-- Quân sư chiến thuật & Gợi ý gậy -->
+        <section class="bg-purple-950/60 backdrop-blur-md p-4 rounded-2xl border border-purple-500/30 shadow-xl">
             <div class="flex items-center gap-2 mb-2">
-                <i class="fa-solid fa-brain text-purple-600"></i>
-                <h3 class="font-bold text-purple-900 text-sm">Quân Sư Chiến Thuật Bắt Cặp</h3>
+                <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i>
+                <h3 class="font-bold text-purple-200 text-sm">Quân Sư Gậy & Bắt Cặp Thông Minh</h3>
             </div>
-            <p class="text-xs text-purple-700 leading-relaxed" id="tacticalAdvice">
-                💡 Gợi ý trận này: Lịch sử đối đầu cho thấy Người chơi 1 đánh cặp rất ăn ý với Người chơi 3. Trận này nên xếp cặp 1&3 đấu với 2&4 để tối ưu điểm chấp!
+            <p class="text-xs text-purple-300 leading-relaxed mb-2" id="tacticalAdvice">
+                💡 Gợi ý bắt cặp: Lịch sử cho thấy <b>Người chơi 1</b> ăn ý với <b>Người chơi 3</b>. Nên xếp cặp 1&3 đấu với 2&4!
+            </p>
+            <p class="text-xs text-emerald-300 font-medium bg-emerald-950/40 p-2 rounded-lg border border-emerald-500/20" id="clubAdvice">
+                🏌️‍♂️ Gợi ý chọn gậy: Khoảng cách chuẩn hố này ~140 yard, khuyên dùng **Gậy sắt số 7**.
             </p>
         </section>
 
-        <!-- Nút Zalo & Xem bảng điểm -->
-        <div class="space-y-2">
-            <button onclick="shareZalo()" class="w-full bg-blue-600 active:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition">
-                <i class="fa-solid fa-share-nodes"></i> Gửi Bảng Điểm Nhanh Qua Zalo
+        <!-- Tính điểm độ cược nhanh -->
+        <section class="bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-700/60 space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-amber-400"><i class="fa-solid fa-coins mr-1"></i> Quỹ Độ / Cược Nhanh (VNĐ)</span>
+                <input type="number" id="wagerAmount" value="100000" step="50000" onchange="updateWager()" class="w-28 bg-slate-800 text-amber-300 font-bold text-xs text-right px-2 py-1 rounded-lg border border-slate-700 focus:outline-none">
+            </div>
+            <div id="wagerSummary" class="text-xs text-slate-300 bg-slate-800/60 p-2.5 rounded-xl border border-slate-700 flex justify-between items-center">
+                <!-- Render tổng kết độ -->
+            </div>
+        </section>
+
+        <!-- Nút thao tác chính -->
+        <div class="space-y-2.5 pt-2">
+            <button onclick="shareZalo()" class="w-full bg-blue-600 active:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition border border-blue-500/40">
+                <i class="fa-solid fa-share-nodes"></i> Gửi Bảng Điểm & Tổng Kết Qua Zalo
             </button>
-            <button onclick="toggleScorecardModal()" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition">
-                <i class="fa-solid fa-table-cells"></i> Xem Bảng Điểm Tổng 18 Hố
+            <button onclick="toggleScorecardModal()" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition border border-emerald-500/40">
+                <i class="fa-solid fa-table-cells"></i> Xem Bảng Điểm Tổng 18 Hố & Nhật Ký
             </button>
         </div>
 
     </main>
 
     <!-- Modal Bảng điểm tổng 18 hố -->
-    <div id="scorecardModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl p-4 max-h-[80vh] flex flex-col shadow-2xl">
-            <div class="flex justify-between items-center mb-3 border-b pb-2">
-                <h3 class="font-bold text-slate-800 text-lg">Bảng Điểm Tổng 18 Hố</h3>
-                <button onclick="toggleScorecardModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">&times;</button>
+    <div id="scorecardModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 text-slate-100 w-full max-w-lg rounded-2xl p-4 max-h-[85vh] flex flex-col shadow-2xl border border-slate-700">
+            <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-emerald-400 text-base"><i class="fa-solid fa-book-open mr-1"></i> Bảng Điểm Tổng & Nhật Ký Sân</h3>
+                <button onclick="toggleScorecardModal()" class="text-slate-400 hover:text-white text-xl font-bold px-2">&times;</button>
             </div>
-            <div class="overflow-x-auto flex-1">
+            <div class="overflow-x-auto flex-1 mb-3">
                 <table class="w-full text-xs text-center border-collapse">
                     <thead>
-                        <tr class="bg-emerald-100 text-emerald-900">
-                            <th class="p-2 text-left sticky left-0 bg-emerald-100">Người chơi</th>
-                            <!-- 1-18 hố -->
+                        <tr class="bg-emerald-900/60 text-emerald-200">
+                            <th class="p-2 text-left sticky left-0 bg-slate-900 border border-slate-800">Người chơi</th>
                             <script>
-                                for(let i=1; i<=18; i++) document.write(`<th class="p-1 border">H${i}</th>`);
+                                for(let i=1; i<=18; i++) document.write(`<th class="p-1 border border-slate-800">H${i}</th>`);
                             </script>
-                            <th class="p-2 bg-emerald-200 font-bold">Tổng</th>
+                            <th class="p-2 bg-emerald-800 font-bold border border-slate-700">Tổng</th>
                         </tr>
                     </thead>
-                    <tbody id="scorecardTableBody">
-                        <!-- Render bằng JS -->
-                    </tbody>
+                    <tbody id="scorecardTableBody"></tbody>
                 </table>
+            </div>
+            <div id="notesHistory" class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 text-xs space-y-1 max-h-32 overflow-y-auto">
+                <p class="font-bold text-amber-400 mb-1">📝 Nhật ký ghi chú các hố:</p>
+                <div id="notesList" class="text-slate-300 space-y-0.5"></div>
             </div>
         </div>
     </div>
 
-    <!-- Script xử lý logic -->
+    <!-- Script xử lý logic thời tiết theo giờ -->
     <script>
         const courses = [
-            { name: "BRG Legend Hill (Hà Nội)", location: "Hà Nội", pars: [4,4,3,4,5,4,3,4,5, 4,5,3,4,4,3,5,4,4] },
-            { name: "Vinpearl Golf (Nha Trang)", location: "Khánh Hòa", pars: [4,5,4,3,4,4,3,5,4, 4,4,3,5,4,4,3,5,4] },
-            { name: "Tân Sơn Nhất (TP.HCM)", location: "TP. Hồ Chí Minh", pars: [4,4,3,5,4,4,5,3,4, 4,3,5,4,4,3,5,4,4] },
-            { name: "FLC Hạ Long (Quảng Ninh)", location: "Quảng Ninh", pars: [4,3,4,5,4,4,3,5,4, 4,4,3,5,4,4,3,5,4] },
-            { name: "Da Nang Golf Club (Đà Nẵng)", location: "Đà Nẵng", pars: [4,4,3,5,4,3,4,5,4, 4,5,3,4,4,3,5,4,4] }
+            { 
+                name: "BRG Legend Hill", location: "Hà Nội", pars: [4,4,3,4,5,4,3,4,5, 4,5,3,4,4,3,5,4,4], 
+                hourly: [
+                    { time: "07:00", temp: "28°C", wind: "Gió Đông Nam 8 km/h", humidity: "75%", tip: "Sáng sớm mát mẻ, gió nhẹ, lý tưởng phát bóng." },
+                    { time: "10:00", temp: "32°C", wind: "Gió Nam 14 km/h", humidity: "65%", tip: "Trời bắt đầu nắng ấm, hướng gió xuôi nhẹ." },
+                    { time: "13:00", temp: "34°C", wind: "Gió Tây Nam 18 km/h", humidity: "58%", tip: "Nắng gắt, gió mạnh hơn, cần chú ý hướng bóng bay lệch." },
+                    { time: "16:00", temp: "30°C", wind: "Gió Đông 12 km/h", humidity: "70%", tip: "Chiều muộn dịu mát dần, hoàn hảo để về đích." }
+                ]
+            },
+            { 
+                name: "Kings' Island Golf", location: "Đồng Mô", pars: [4,5,4,3,4,4,3,5,4, 4,4,3,5,4,4,3,5,4], 
+                hourly: [
+                    { time: "07:00", temp: "27°C", wind: "Gió hồ Tây Bắc 10 km/h", humidity: "78%", tip: "Sương mù nhẹ khu vực hồ, chú ý tầm nhìn." },
+                    { time: "10:00", temp: "31°C", wind: "Gió Bắc 12 km/h", humidity: "68%", tip: "Thời tiết đẹp, không khí thoáng đãng." },
+                    { time: "13:00", temp: "33°C", wind: "Gió Tây Bắc 16 km/h", humidity: "60%", tip: "Nắng chiếu trực diện một số hố ven hồ." },
+                    { time: "16:00", temp: "29°C", wind: "Gió Bắc Nam 11 km/h", humidity: "72%", tip: "Hoàng hôn đẹp trên hồ Đồng Mô." }
+                ]
+            },
+            { 
+                name: "FLC Hạ Long", location: "Quảng Ninh", pars: [4,3,4,5,4,4,3,5,4, 4,4,3,5,4,4,3,5,4], 
+                hourly: [
+                    { time: "07:00", temp: "26°C", wind: "Gió biển Đông 15 km/h", humidity: "80%", tip: "Gió biển thổi lồng lộng, thoáng mát." },
+                    { time: "10:00", temp: "29°C", wind: "Gió biển Đông Nam 20 km/h", humidity: "70%", tip: "Gió biển hơi mạnh, cần tính toán độ bay của bóng." },
+                    { time: "13:00", temp: "31°C", wind: "Gió biển Nam 22 km/h", humidity: "65%", tip: "Nắng vịnh phản chiếu mạnh, nhớ đeo kính râm." },
+                    { time: "16:00", temp: "28°C", wind: "Gió biển Đông 16 km/h", humidity: "75%", tip: "Thời tiết lý tưởng ngắm cảnh biển." }
+                ]
+            },
+            { 
+                name: "Vinpearl Golf Hải Phòng", location: "Hải Phòng", pars: [4,4,3,5,4,3,4,5,4, 4,5,3,4,4,3,5,4,4], 
+                hourly: [
+                    { time: "07:00", temp: "27°C", wind: "Gió Đông 12 km/h", humidity: "76%", tip: "Sáng đẹp trời, đảo Vũ Yên thoáng gió." },
+                    { time: "10:00", temp: "31°C", wind: "Gió Đông Bắc 15 km/h", humidity: "68%", tip: "Nắng vàng rực rỡ, sân khô ráo." },
+                    { time: "13:00", temp: "33°C", wind: "Gió Đông Nam 19 km/h", humidity: "60%", tip: "Gió đổi hướng nhẹ từ đầm lầy sang." },
+                    { time: "16:00", temp: "29°C", wind: "Gió Đông 13 km/h", humidity: "73%", tip: "Mát mẻ về chiều." }
+                ]
+            },
+            { 
+                name: "Vinpearl Golf Nha Trang", location: "Khánh Hòa", pars: [4,5,4,3,4,4,3,5,4, 4,4,3,5,4,4,3,5,4], 
+                hourly: [
+                    { time: "07:00", temp: "29°C", wind: "Gió vịnh 10 km/h", humidity: "70%", tip: "Nắng sớm tuyệt đẹp trên đảo Hòn Tre." },
+                    { time: "10:00", temp: "33°C", wind: "Gió biển 16 km/h", humidity: "60%", tip: "Trời nắng nóng, chú ý bổ sung nước đầy đủ." },
+                    { time: "13:00", temp: "35°C", wind: "Gió biển Nam 20 km/h", humidity: "55%", tip: "Nắng đỉnh điểm, gió biển thổi mạnh ngang sân." },
+                    { time: "16:00", temp: "31°C", wind: "Gió vịnh 12 km/h", humidity: "66%", tip: "Bắt đầu dịu nắng, chơi rất thích." }
+                ]
+            },
+            { 
+                name: "Ba Na Hills Golf Club", location: "Đà Nẵng", pars: [4,4,3,4,5,4,3,4,5, 4,5,3,4,4,3,5,4,4], 
+                hourly: [
+                    { time: "07:00", temp: "24°C", wind: "Gió núi 6 km/h", humidity: "85%", tip: "Sương sớm chân núi Bà Nà, không khí cực kỳ trong lành." },
+                    { time: "10:00", temp: "28°C", wind: "Gió thung lũng 10 km/h", humidity: "75%", tip: "Nắng ấm áp, địa hình dốc lượn sóng." },
+                    { time: "13:00", temp: "30°C", wind: "Gió núi 12 km/h", humidity: "70%", tip: "Nắng đẹp, không quá oi bức do ở độ cao." },
+                    { time: "16:00", temp: "26°C", wind: "Gió núi 8 km/h", humidity: "80%", tip: "Mây mờ che đỉnh núi, thời tiết cực chill." }
+                ]
+            },
+            { 
+                name: "Hoiana Shores Golf Club", location: "Quảng Nam", pars: [4,4,3,5,4,3,4,5,4, 4,5,3,4,4,3,5,4,4], 
+                hourly: [
+                    { time: "07:00", temp: "28°C", wind: "Gió biển 14 km/h", humidity: "74%", tip: "Sân links ven biển, gió thổi thoáng đãng." },
+                    { time: "10:00", temp: "32°C", wind: "Gió Nam 18 km/h", humidity: "65%", tip: "Gió biển mạnh dần, thử thách các đường bóng dài." },
+                    { time: "13:00", temp: "34°C", wind: "Gió Nam mạnh 24 km/h", humidity: "58%", tip: "Gió cát ven biển thổi ngược, cần tính toán kỹ lực đánh." },
+                    { time: "16:00", temp: "30°C", wind: "Gió biển 16 km/h", humidity: "70%", tip: "Hoàng hôn tuyệt đẹp trên sân links." }
+                ]
+            },
+            { 
+                name: "Tân Sơn Nhất", location: "TP. Hồ Chí Minh", pars: [4,4,3,5,4,4,5,3,4, 4,3,5,4,4,3,5,4,4], 
+                hourly: [
+                    { time: "07:00", temp: "30°C", wind: "Gió nhẹ 8 km/h", humidity: "75%", tip: "Sài Gòn sáng sớm nắng ráo, quang đãng." },
+                    { time: "10:00", temp: "34°C", wind: "Gió Tây Nam 12 km/h", humidity: "62%", tip: "Trời khá oi bức, chú ý giữ sức." },
+                    { time: "13:00", temp: "36°C", wind: "Gió Tây Nam 15 km/h", humidity: "55%", tip: "Nắng gay gắt đỉnh điểm, đánh nhanh rút gọn." },
+                    { time: "16:00", temp: "32°C", wind: "Gió nhẹ 10 km/h", humidity: "68%", tip: "Có thể có mây dông chiều muộn (đặc trưng Nam Bộ)." }
+                ]
+            },
+            { 
+                name: "The Bluffs Grand Ho Tram", location: "Vũng Tàu", pars: [4,5,4,3,4,4,3,5,4, 4,4,3,5,4,4,3,5,4], 
+                hourly: [
+                    { time: "07:00", temp: "28°C", wind: "Gió biển Hồ Tràm 18 km/h", humidity: "76%", tip: "Gió cồn cát thổi mạnh ngay từ sáng." },
+                    { time: "10:00", temp: "32°C", wind: "Gió biển 24 km/h", humidity: "65%", tip: "Thử thách gió biển thổi ngang đỉnh đồi cát." },
+                    { time: "13:00", temp: "33°C", wind: "Gió biển mạnh 28 km/h", humidity: "60%", tip: "Gió cực kỳ mạnh, cần dùng gậy lớn và đánh thấp bóng." },
+                    { time: "16:00", temp: "29°C", wind: "Gió biển 20 km/h", humidity: "72%", tip: "Hoàng hôn buông xuống cồn cát rất đẹp." }
+                ]
+            },
+            { 
+                name: "Vinpearl Golf Phú Quốc", location: "Kiên Giang", pars: [4,4,3,4,5,4,3,4,5, 4,5,3,4,4,3,5,4,4], 
+                hourly: [
+                    { time: "07:00", temp: "29°C", wind: "Gió đảo 9 km/h", humidity: "82%", tip: "Sáng sớm trong lành giữa rừng nguyên sinh Bắc đảo." },
+                    { time: "10:00", temp: "32°C", wind: "Gió nhẹ 12 km/h", humidity: "72%", tip: "Nắng vàng rực rỡ, không khí thoáng đãng." },
+                    { time: "13:00", temp: "34°C", wind: "Gió Tây 15 km/h", humidity: "66%", tip: "Nắng nhiệt đới, thỉnh thoảng có mây che." },
+                    { time: "16:00", temp: "30°C", wind: "Gió đảo 10 km/h", humidity: "78%", tip: "Hoàng hôn biển Tây cực kỳ lãng mạn." }
+                ]
+            }
         ];
 
         let currentCourseIndex = 0;
+        let currentHourIndex = 0;
         let currentHole = 1;
+        let wagerPerHole = 100000;
         let players = [
             { name: "Người chơi 1", scores: Array(18).fill(4) },
             { name: "Người chơi 2", scores: Array(18).fill(4) },
             { name: "Người chơi 3", scores: Array(18).fill(4) },
             { name: "Người chơi 4", scores: Array(18).fill(4) }
         ];
+        let holeNotes = {};
 
         function init() {
             renderHole();
             updateWeather();
+            updateWager();
         }
 
         function changeCourse() {
             currentCourseIndex = document.getElementById('courseSelect').value;
+            currentHourIndex = 0; // Reset về mốc sáng khi đổi sân
+            updateWeatherButtonsStyle();
             updateWeather();
-            renderHole();
+        }
+
+        function setHourlyWeather(hourIdx) {
+            currentHourIndex = hourIdx;
+            updateWeatherButtonsStyle();
+            updateWeather();
+        }
+
+        function updateWeatherButtonsStyle() {
+            for(let i=0; i<4; i++) {
+                let btn = document.getElementById(`btnHour${i}`);
+                if(i === currentHourIndex) {
+                    btn.className = "bg-emerald-600 text-white text-xs py-1.5 rounded-lg font-bold border border-emerald-500 shadow-md";
+                } else {
+                    btn.className = "bg-slate-800 text-slate-300 text-xs py-1.5 rounded-lg font-semibold border border-slate-700";
+                }
+            }
         }
 
         function updateWeather() {
             const course = courses[currentCourseIndex];
-            document.getElementById('weatherTitle').innerText = `Thời tiết tại ${course.location}`;
+            const hData = course.hourly[currentHourIndex];
+            
+            document.getElementById('weatherTitle').innerText = `${course.name}`;
+            document.getElementById('weatherTimeLabel').innerText = `Khung giờ: ${hData.time}`;
+            document.getElementById('weatherDesc').innerHTML = `<b class="text-white">${hData.temp}</b> • ${hData.wind} • Độ ẩm ${hData.humidity}`;
+            document.getElementById('weatherTip').innerText = `💡 ${hData.tip}`;
         }
 
         function changeHole(direction) {
@@ -160,17 +321,22 @@
             let html = '';
             players.forEach((p, pIndex) => {
                 html += `
-                    <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                        <input type="text" value="${p.name}" onchange="updatePlayerName(${pIndex}, this.value)" class="bg-transparent font-bold text-sm text-slate-700 w-32 focus:outline-none border-b border-transparent focus:border-emerald-500">
+                    <div class="flex items-center justify-between bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/80">
+                        <input type="text" value="${p.name}" onchange="updatePlayerName(${pIndex}, this.value)" class="bg-transparent font-bold text-xs sm:text-sm text-slate-200 w-32 focus:outline-none border-b border-transparent focus:border-emerald-400">
                         <div class="flex items-center gap-3">
-                            <button onclick="updateScore(${pIndex}, -1)" class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold active:scale-95"><i class="fa-solid fa-minus text-xs"></i></button>
-                            <span class="text-lg font-black w-6 text-center text-slate-800">${p.scores[currentHole - 1]}</span>
-                            <button onclick="updateScore(${pIndex}, 1)" class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold active:scale-95"><i class="fa-solid fa-plus text-xs"></i></button>
+                            <button onclick="updateScore(${pIndex}, -1)" class="w-8 h-8 rounded-full bg-red-950/60 text-red-400 border border-red-500/40 flex items-center justify-center font-bold active:scale-95"><i class="fa-solid fa-minus text-xs"></i></button>
+                            <span class="text-base font-black w-6 text-center text-white">${p.scores[currentHole - 1]}</span>
+                            <button onclick="updateScore(${pIndex}, 1)" class="w-8 h-8 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-bold active:scale-95"><i class="fa-solid fa-plus text-xs"></i></button>
                         </div>
                     </div>
                 `;
             });
             document.getElementById('playerInputs').innerHTML = html;
+            document.getElementById('holeNote').value = holeNotes[currentHole] || '';
+            
+            let par = course.pars[currentHole - 1];
+            let clubText = par === 3 ? "Hố Par 3 ngắn, khuyên dùng Gậy sắt số 8 hoặc 9." : (par === 5 ? "Hố Par 5 dài, ưu tiên Driver mạnh và Gậy gỗ số 3." : "Hố Par 4 chuẩn, khuyên dùng Gậy sắt số 7 hoặc 6.");
+            document.getElementById('clubAdvice').innerHTML = `🏌️‍♂️ Gợi ý chọn gậy: ${clubText}`;
         }
 
         function updateScore(pIndex, delta) {
@@ -178,6 +344,7 @@
             if (currentScore < 1) currentScore = 1;
             players[pIndex].scores[currentHole - 1] = currentScore;
             renderHole();
+            updateWager();
         }
 
         function updatePlayerName(pIndex, newName) {
@@ -186,11 +353,31 @@
         }
 
         function updateTacticalAdvice() {
-            document.getElementById('tacticalAdvice').innerHTML = `💡 Gợi ý trận này: Lịch sử đối đầu cho thấy <b>${players[0].name}</b> đánh cặp rất ăn ý với <b>${players[2].name}</b>. Trận này nên xếp cặp 1&3 đấu với 2&4 để tối ưu điểm chấp!`;
+            document.getElementById('tacticalAdvice').innerHTML = `💡 Gợi ý bắt cặp: Lịch sử cho thấy <b>${players[0].name}</b> ăn ý với <b>${players[2].name}</b>. Nên xếp cặp 1&3 đấu với 2&4!`;
+        }
+
+        function saveHoleNote(note) {
+            if(note.trim() !== "") {
+                holeNotes[currentHole] = note;
+            } else {
+                delete holeNotes[currentHole];
+            }
+        }
+
+        function updateWager() {
+            wagerPerHole = parseInt(document.getElementById('wagerAmount').value) || 0;
+            let scoresAtHole = players.map(p => p.scores[currentHole - 1]);
+            let minScore = Math.min(...scoresAtHole);
+            let winners = players.filter((p, i) => p.scores[currentHole - 1] === minScore).map(p => p.name);
+            
+            document.getElementById('wagerSummary').innerHTML = `
+                <span>Hố ${currentHole} đang dẫn đầu: <b class="text-emerald-400">${winners.join(', ')}</b></span>
+                <span class="text-amber-300 font-bold">${wagerPerHole.toLocaleString()}đ/hố</span>
+            `;
         }
 
         function shareZalo() {
-            alert("🚀 Đã xuất ảnh tổng kết bảng điểm và mở sẵn Zalo để ba gửi khoe với các bác trong hội!");
+            alert("🚀 Đã xuất ảnh tổng kết bảng điểm kèm quỹ độ và mở sẵn nhóm chat Zalo để ba gửi khoe với các bác!");
         }
 
         function toggleScorecardModal() {
@@ -198,6 +385,7 @@
             modal.classList.toggle('hidden');
             if(!modal.classList.contains('hidden')) {
                 renderScorecardTable();
+                renderNotesHistory();
             }
         }
 
@@ -205,13 +393,26 @@
             let html = '';
             players.forEach(p => {
                 let total = p.scores.reduce((a, b) => a + b, 0);
-                html += `<tr class="border-b"><td class="p-2 text-left font-bold sticky left-0 bg-white">${p.name}</td>`;
+                html += `<tr class="border-b border-slate-800"><td class="p-2 text-left font-bold sticky left-0 bg-slate-900 border-r border-slate-800">${p.name}</td>`;
                 p.scores.forEach(s => {
-                    html += `<td class="p-1 border">${s}</td>`;
+                    html += `<td class="p-1 border border-slate-800">${s}</td>`;
                 });
-                html += `<td class="p-2 font-black text-emerald-600 bg-emerald-50">${total}</td></tr>`;
+                html += `<td class="p-2 font-black text-emerald-400 bg-emerald-950/40 border border-slate-700">${total}</td></tr>`;
             });
             document.getElementById('scorecardTableBody').innerHTML = html;
+        }
+
+        function renderNotesHistory() {
+            let notesHtml = '';
+            let keys = Object.keys(holeNotes);
+            if(keys.length === 0) {
+                notesHtml = '<p class="text-slate-500 italic">Chưa có ghi chú nào trong trận này.</p>';
+            } else {
+                keys.sort((a,b) => a - b).forEach(h => {
+                    notesHtml += `<p>• <b>Hố ${h}:</b> ${holeNotes[h]}</p>`;
+                });
+            }
+            document.getElementById('notesList').innerHTML = notesHtml;
         }
 
         init();
